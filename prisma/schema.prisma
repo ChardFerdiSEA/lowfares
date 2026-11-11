@@ -1,0 +1,51 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model SearchLog {
+  id              String   @id @default(uuid())
+  origin          String
+  destination     String
+  departDate      String
+  returnDate      String?
+  passengers      Int      @default(1)
+  tripType        String   @default("one-way")
+  resultsCount    Int      @default(0)
+  cheapestFarePHP Float?
+  searchedAt      DateTime @default(now())
+
+  @@index([origin, destination, departDate])
+}
+
+model PriceAlert {
+  id          String   @id @default(uuid())
+  email       String
+  origin      String
+  destination String
+  departDate  String
+  targetPrice Float
+  currency    String   @default("PHP")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([email])
+  @@index([origin, destination])
+}
+
+model ScrapeHealthMetric {
+  id            String   @id @default(uuid())
+  provider      String   // PAL, CebuPacific, AirAsia
+  status        String   // SUCCESS, TIMEOUT, ERROR, BLOCKED
+  responseTimeMs Int
+  flightCount   Int      @default(0)
+  errorMessage  String?
+  timestamp     DateTime @default(now())
+
+  @@index([provider, timestamp])
+}
